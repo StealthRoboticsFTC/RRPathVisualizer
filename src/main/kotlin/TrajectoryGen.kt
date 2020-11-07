@@ -4,32 +4,31 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumConstraints
+import java.util.*
 
 object TrajectoryGen {
     // Remember to set these constraints to the same values as your DriveConstants.java file in the quickstart
-    private val driveConstraints = DriveConstraints(60.0, 60.0, 0.0, 270.0.toRadians, 270.0.toRadians, 0.0)
+    private val driveConstraints = DriveConstraints(60.0, 30.0, 0.0, 180.0.toRadians, 180.0.toRadians, 0.0)
 
     // Remember to set your track width to an estimate of your actual bot to get accurate trajectory profile duration!
     private const val trackWidth = 16.0
 
     private val combinedConstraints = MecanumConstraints(driveConstraints, trackWidth)
 
-    private val startPose = Pose2d(-48.0, -48.0, 90.0.toRadians)
+    private val autoConfig = FieldUtil.AutoConfig(FieldUtil.Color.RED, FieldUtil.Side.CENTER, FieldUtil.StackHeight.ZERO)
+    private val startPose = FieldUtil.getStartPose(autoConfig)
 
-    fun createTrajectory(): ArrayList<Trajectory> {
+    fun createTrajectory(): List<Trajectory> {
         val list = ArrayList<Trajectory>()
 
         val builder1 = TrajectoryBuilder(startPose, startPose.heading, combinedConstraints)
 
-        builder1.forward(40.0);
-
-        // Small Example Routine
-//        builder1
-//            .splineTo(Vector2d(10.0, 10.0), 0.0)
-//            .splineTo(Vector2d(15.0, 15.0), 90.0);
-
+        val dropoffMidPose = FieldUtil.getDropoffMidPose(autoConfig)
+        val dropoffPose = FieldUtil.getDropoffPose(autoConfig)
+        builder1
+            .splineTo(dropoffMidPose.vec(), dropoffMidPose.heading)
+            .splineTo(dropoffPose.vec(), dropoffPose.heading)
         list.add(builder1.build())
-
         return list
     }
 
