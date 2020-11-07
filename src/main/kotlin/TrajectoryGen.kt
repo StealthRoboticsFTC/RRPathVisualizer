@@ -1,5 +1,3 @@
-import com.acmerobotics.roadrunner.geometry.Pose2d
-import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints
@@ -15,7 +13,7 @@ object TrajectoryGen {
 
     private val combinedConstraints = MecanumConstraints(driveConstraints, trackWidth)
 
-    private val autoConfig = FieldUtil.AutoConfig(FieldUtil.Color.RED, FieldUtil.Side.CENTER, FieldUtil.StackHeight.ZERO)
+    private val autoConfig = FieldUtil.AutoConfig(FieldUtil.Color.BLUE, FieldUtil.Side.CENTER, FieldUtil.StackHeight.FOUR)
     private val startPose = FieldUtil.getStartPose(autoConfig)
 
     fun createTrajectory(): List<Trajectory> {
@@ -25,15 +23,17 @@ object TrajectoryGen {
 
         val dropoffMidPose = FieldUtil.getDropoffMidPose(autoConfig)
         val dropoffPose = FieldUtil.getDropoffPose(autoConfig)
-        builder1
-            .splineTo(dropoffMidPose.vec(), dropoffMidPose.heading)
-            .splineTo(dropoffPose.vec(), dropoffPose.heading)
+        if (!(autoConfig.side == FieldUtil.Side.FAR && autoConfig.stackHeight == FieldUtil.StackHeight.ZERO)) {
+            builder1.splineTo(dropoffMidPose.vec(), dropoffMidPose.heading)
+        }
+        builder1.splineTo(dropoffPose.vec(), dropoffPose.heading)
         list.add(builder1.build())
+
         return list
     }
 
     fun drawOffbounds() {
-        GraphicsUtil.fillRect(Vector2d(0.0, -63.0), 18.0, 18.0) // robot against the wall
+//        GraphicsUtil.fillRect(Vector2d(0.0, -63.0), 18.0, 18.0) // robot against the wall
     }
 }
 
